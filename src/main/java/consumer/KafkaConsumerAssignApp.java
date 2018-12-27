@@ -4,19 +4,15 @@ package consumer;
 import helpers.Constants;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.PartitionInfo;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import java.time.Duration;
 import java.util.*;
-import java.util.stream.Collectors;
 
-public class KafkaConsumerApp {
+public class KafkaConsumerAssignApp {
 
     public static void main(String[] args) {
         KafkaConsumer myConsumer = CreateKafkaConsumer();
-        GetAllTopics(myConsumer).forEach(System.out::println);
         RunKafkaConsumer(myConsumer);
     }
 
@@ -30,15 +26,9 @@ public class KafkaConsumerApp {
         return new KafkaConsumer(props);
     }
 
-    private static List<List<String>> GetAllTopics(KafkaConsumer myConsumer) {
-        System.out.println("Trying to get topics...");
-        Map<String, List<PartitionInfo>> listTopics = myConsumer.listTopics();
-        return listTopics.values().stream().map(x -> x.stream().map(PartitionInfo::topic).collect(Collectors.toList())).collect(Collectors.toList());
-    }
-
     private static void RunKafkaConsumer(KafkaConsumer myConsumer) {
         System.out.println("Topics received. Trying to subscribe to topic...");
-        myConsumer.subscribe(Constants.topics);
+        myConsumer.assign(Constants.partitions);
 
         try (myConsumer) {
             while (true) {
